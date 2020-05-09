@@ -1,5 +1,9 @@
 # snakeScanner
-Sniff and Mitm Tool
+Tool for LAN attacks:
+
+- Host-Discovery
+- Sniff
+- MITM 
 
 ## Usage 
 
