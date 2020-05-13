@@ -5,7 +5,7 @@ Tool for LAN attacks:
 - Sniff
 - MITM 
 
-## Usage 
+## Usage - Only in Linux
 
 - Enable your Ip_forward (need root privileges)
 
