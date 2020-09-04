@@ -1,7 +1,11 @@
 # snakeScanner
-Sniff and Mitm Tool
+Tool for LAN attacks:
 
-## Usage 
+- Host-Discovery
+- Sniff
+- MITM 
+
+## Usage - Only in Linux
 
 - Enable your Ip_forward (need root privileges)
 
