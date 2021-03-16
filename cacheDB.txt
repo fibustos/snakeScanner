@@ -1,7 +1,4 @@
-192.168.0.1/40:0d:10:07:fb:00/ARRIS Group, Inc.
-192.168.0.3/f8:32:e4:a0:ff:96/ASUSTek COMPUTER INC.
-192.168.0.10/4c:57:ca:bf:9a:ad/Apple, Inc.
-192.168.0.22/68:5b:35:a8:44:e5/Apple, Inc.
-192.168.0.26/60:6c:66:28:a7:30/Intel Corporate
-192.168.0.252/00:00:ca:01:02:03/ARRIS Group, Inc.
-192.168.0.7/cc:46:4e:07:e9:b4/Samsung Electronics Co.,Ltd
+192.168.1.1/cc:ed:dc:58:15:f0/MitraStar Technology Corp.
+192.168.1.22/68:5b:35:a8:44:e5/Apple, Inc.
+192.168.1.87/f8:32:e4:a0:ff:96/ASUSTek COMPUTER INC.
+192.168.1.94/4c:17:44:5d:6d:27/Amazon Technologies Inc.

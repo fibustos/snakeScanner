@@ -24,9 +24,6 @@ else :
     gateway_ip = sys.argv[3]
     #obtener la mac del gateway
     gateway_mac = host_discovery.get_mac(gateway_ip)
-    # set our interface
-    print "[*] Setting up Interface %s" % (interface)
-    conf.iface = interface
     # turn off output
     conf.verb = 0
 

@@ -64,7 +64,6 @@ def read_cacheDB():
     new_data = []
     for line in data:
         host = line.split("/")
-        print host
         new_data.append(host)
     f.close()
     return new_data

@@ -3,13 +3,6 @@ from netfilterqueue import NetfilterQueue
 import os
 import requests
 
-dns_hosts = {
-    b"www.google.com." : "144.217.66.188",
-    b"google.com." : "144.217.66.188",
-    b"google.cl." : "144.217.66.188",
-    b"www.google.cl." : "144.217.66.188"
-}
-
 def raw_verify(packet):
     """
     Verifica que el paquete contiene payload o data.
@@ -58,6 +51,13 @@ def print_packet(pkt):
         pkt.accept()
 
 def modify_dns(pkt):
+    dns_hosts = {
+    b"www.google.com." : "144.217.66.188",
+    b"google.com." : "144.217.66.188",
+    b"google.cl." : "144.217.66.188",
+    b"www.google.cl." : "144.217.66.188"
+    }
+    
     data = pkt.get_payload()
     packet = IP(data)
     if packet.haslayer(DNSRR):
